@@ -1,32 +1,31 @@
-name: Criar Release Manual
+name: Create Release
 
 on:
   workflow_dispatch:
     inputs:
       version:
-        description: "Informe a versão (ex: v1.0.0)"
+        description: 'Versão do release'
         required: true
-        default: "v1.0.0"
+        type: string
+
+permissions:
+  contents: write
 
 jobs:
   release:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout do Repositório
+      - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Compactar Projeto
+      - name: Criar ZIP do projeto
         run: |
-          zip -r projeto-${{ github.event.inputs.version }}.zip . -x ".git/*"
+          zip -r release.zip .
 
-      - name: Criar Release
+      - name: Criar Release e Upload
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ github.event.inputs.version }}
           name: Release ${{ github.event.inputs.version }}
-          draft: false
-          prerelease: false
-          files: projeto-${{ github.event.inputs.version }}.zip
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          files: release.zip
